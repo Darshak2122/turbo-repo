@@ -35,6 +35,10 @@ a {
 .imgDark {
   display: none;
 }
+.btn{
+  color: white;
+  border: 1px solid;
+}
 
 @media (prefers-color-scheme: dark) {
   html {
