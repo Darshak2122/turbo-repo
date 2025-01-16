@@ -10,7 +10,8 @@ import Paper from "@mui/material/Paper";
 import { Box, Button } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Link from "next/link";
-import { useMutation } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 // Define the DataRow interface
 interface DataRow {
   name: string;
@@ -22,7 +23,6 @@ interface DataRow {
 }
 
 export default function BasicTable() {
-  const [data, setData] = React.useState<DataRow[]>([]);
   const [formData, setFormData] = React.useState<DataRow>({
     name: "",
     city: "",
@@ -33,18 +33,39 @@ export default function BasicTable() {
   });
 
   // Fetch data from localStorage
-  React.useEffect(() => {
-    const getObj = JSON.parse(localStorage.getItem("formData") || "[]");
-    setData(getObj);
-  }, []);
+  // React.useEffect(() => {
+  //   const getObj = JSON.parse(localStorage.getItem("formData") || "[]");
+  //   setData(getObj);
+  // }, []);
 
-  // Function to delete a row
-  const deleteRow = (index: number) => {
-    const newData = data.filter((_, i) => i !== index);
-    setData(newData);
-    // Update localStorage
-    localStorage.setItem("formData", JSON.stringify(newData));
-  };
+
+  const { data } = useQuery({
+    queryKey :['users'],
+    queryFn  : async ()=>{
+      const items = await axios.get('http://localhost:4040/users')
+      return items.data
+    }
+  })
+  const client = useQueryClient()
+  const {mutate} = useMutation({
+    mutationFn : async (id)=>{
+      const items = await axios.delete(`http://localhost:4040/users/${id}`)
+      return items.data
+    },
+    onSuccess : () => client.invalidateQueries({
+      queryKey : ['users']
+    })
+  })
+  
+
+
+  // // Function to delete a row
+  // const deleteRow = (index: number) => {
+  //   const newData = data.filter((_, i) => i !== index);
+  //   setData(newData);
+  //   // Update localStorage
+  //   localStorage.setItem("formData", JSON.stringify(newData));
+  // };
 
   return (
     <Box sx={{ padding: "20px 50px", marginTop: "50px", marginRight: "30px" }}>
@@ -76,7 +97,7 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row, index) => (
+            {data?.length && data?.map((row:any, index:number) => (
               <TableRow
                 key={index}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -92,7 +113,7 @@ export default function BasicTable() {
                 </TableCell>
                 <TableCell align="center">
                   <Button>Edit</Button>
-                  <Button onClick={() => deleteRow(index)}>Delete</Button>
+                  <Button onClick={()=>mutate(row?.id)}>Delete</Button>
                 </TableCell>
               </TableRow>
             ))}

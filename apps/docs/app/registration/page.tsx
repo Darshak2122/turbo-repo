@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
@@ -26,7 +25,8 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-
+import { useQuery, useMutation } from "@tanstack/react-query";
+import axios from "axios";
 // Zod schema for validation
 const loginSchema = z.object({
   name: z
@@ -56,39 +56,63 @@ const Registration = () => {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isValid },
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
     mode: "onBlur",
+    defaultValues: {
+      account: "",
+      city: "select a city",
+      gender: "male",
+      name: "",
+      phone: "",
+      skills: [],
+    },
   });
 
-  const onSubmit: SubmitHandler<LoginFormInputs> = (data) => {
-    if (isValid) {
-      // Retrieve existing data from localStorage
-      const existingData = JSON.parse(localStorage.getItem("formData") || "[]");
-
-      // Add the new data (including selected skills)
-      const updatedData = [...existingData, data];
-
-      // Save the updated data back to localStorage
-      localStorage.setItem("formData", JSON.stringify(updatedData));
+  const { mutate } = useMutation({
+    mutationFn: async (data) => {
+      return await axios.post("http://localhost:4040/users", data);
+    },
+    onSuccess: () => {
       setIsSubmitted(true);
-
-      // Reset the form fields after submission
-      reset();
-      // Hide alert after 3 seconds
       setTimeout(() => {
         setIsSubmitted(false);
       }, 3000);
+    },
+  });
+
+  const onSubmit: SubmitHandler<LoginFormInputs> = (data: any) => {
+    if (isValid) {
+      // // Retrieve existing data from localStorage
+      // const existingData = JSON.parse(localStorage.getItem("formData") || "[]");
+
+      // // Add the new data (including selected skills)
+      // const updatedData = [...existingData, data];
+
+      // // Save the updated data back to localStorage
+      // localStorage.setItem("formData", JSON.stringify(updatedData));
+      mutate(data);
+
+      reset({
+        account: "",
+        city: "",
+        gender: "male",
+        name: "",
+        phone: "",
+        skills: [],
+      });
+      console.log(watch('city'))
     }
   };
 
-  React.useEffect(() => {
-    // Retrieve data from localStorage on initial load and update state
-    const data = JSON.parse(localStorage.getItem("formData") || "[]");
-  }, []);
+  // React.useEffect(() => {
+  //   // Retrieve data from localStorage on initial load and update state
+  //   const data = JSON.parse(localStorage.getItem("formData") || "[]");
+  // }, []);
 
-  // Cities Array 
+  // Cities Array
   const cities = [
     "New York",
     "Los Angeles",
@@ -129,7 +153,6 @@ const Registration = () => {
             onSubmit={handleSubmit(onSubmit)}
             sx={{ mt: 2, width: "100%" }}
           >
-
             <TextField
               fullWidth
               label="Name"
@@ -163,7 +186,10 @@ const Registration = () => {
               error={!!errors.city}
             >
               <InputLabel>City</InputLabel>
-              <Select label="City" {...register("city")}>
+              <Select value={watch('city')} label="City" {...register("city")}>
+                <MenuItem value="" disabled>
+                  Select a city
+                </MenuItem>
                 {cities.map((city, index) => (
                   <MenuItem key={index} value={city}>
                     {city}
@@ -281,7 +307,6 @@ const Registration = () => {
             <Typography>Form submitted successfully!</Typography>
           </Alert>
         )}
-        
       </Card>
     </Container>
   );
