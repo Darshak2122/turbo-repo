@@ -8,7 +8,6 @@ import axios from "axios";
 import { useState, useCallback } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import { Button, CircularProgress } from "@mui/material";
-import { Interface } from "readline";
 
 const ProductList = () => {
   const queryClient = useQueryClient();

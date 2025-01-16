@@ -10,28 +10,27 @@ import Paper from "@mui/material/Paper";
 import { Box, Button } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Link from "next/link";
-
+import { useMutation } from "@tanstack/react-query";
 // Define the DataRow interface
 interface DataRow {
   name: string;
   city: string;
   phone: string;
   account: string;
+  gender: string;
+  skills: string[];
 }
 
 export default function BasicTable() {
   const [data, setData] = React.useState<DataRow[]>([]);
-  const [editData, setEditData] = React.useState<DataRow | null>(null); // Store data of the row to edit
   const [formData, setFormData] = React.useState<DataRow>({
     name: "",
     city: "",
     phone: "",
     account: "",
+    gender: "",
+    skills: [],
   });
-
-  // const router = useRouter(); // Initialize the useRouter hook
-
-  console.log("call------data", data);
 
   // Fetch data from localStorage
   React.useEffect(() => {
@@ -41,16 +40,10 @@ export default function BasicTable() {
 
   // Function to delete a row
   const deleteRow = (index: number) => {
-    const newData = data.filter((_, i) => i !== index); // Remove item at index
+    const newData = data.filter((_, i) => i !== index);
     setData(newData);
-    localStorage.setItem("formData", JSON.stringify(newData)); // Update localStorage
-  };
-
-  // Function to handle edit
-  const editRow = (index: number) => {
-    const selectedRow = data[index]; // Get the selected row data
-    setEditData(selectedRow); // Set selected row data for editing
-    setFormData({ ...selectedRow }); // Pre-fill form with data
+    // Update localStorage
+    localStorage.setItem("formData", JSON.stringify(newData));
   };
 
   return (
@@ -76,7 +69,9 @@ export default function BasicTable() {
               <TableCell align="left">Name</TableCell>
               <TableCell align="center">City</TableCell>
               <TableCell align="center">Phone</TableCell>
+              <TableCell align="center">Gender</TableCell>
               <TableCell align="center">Account</TableCell>
+              <TableCell align="center">Skills</TableCell>
               <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -90,9 +85,13 @@ export default function BasicTable() {
                 <TableCell align="left">{row.name}</TableCell>
                 <TableCell align="center">{row.city}</TableCell>
                 <TableCell align="center">{row.phone}</TableCell>
+                <TableCell align="center">{row.gender}</TableCell>
                 <TableCell align="center">{row.account}</TableCell>
                 <TableCell align="center">
-                  <Button onClick={() => editRow(index)}>Edit</Button>
+                  {row.skills.join(", ")}
+                </TableCell>
+                <TableCell align="center">
+                  <Button>Edit</Button>
                   <Button onClick={() => deleteRow(index)}>Delete</Button>
                 </TableCell>
               </TableRow>

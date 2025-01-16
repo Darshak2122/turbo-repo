@@ -12,6 +12,17 @@ import {
   Container,
   Card,
   Alert,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  InputAdornment,
+  RadioGroup,
+  FormLabel,
+  FormControlLabel,
+  Radio,
+  Checkbox,
+  FormGroup,
 } from "@mui/material";
 import Link from "next/link";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -20,24 +31,26 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 const loginSchema = z.object({
   name: z
     .string({ required_error: "Name is required" })
-    .min(2, { message: "Name is must be 2 characters" })
+    .min(2, { message: "Name must be 2 characters" })
     .max(20, { message: "Name must be less than 20 characters" }),
   city: z
     .string({ required_error: "City is required" })
-    .min(2, { message: "City is must be at 2 characters" })
-    .max(50, { message: "City name must be less than 50 characters" }),
+    .min(2, { message: "Please select the city" }),
   phone: z
     .string({ required_error: "Phone Number is required" })
     .regex(/^\d{10}$/, { message: "Phone must be a 10-digit number" }),
   account: z
     .string({ required_error: "Account Number is required" })
     .regex(/^\d{10,12}$/, { message: "Account must be 10-12 digits" }),
+  gender: z.enum(["female", "male", "other"], {
+    message: "Gender is required",
+  }),
+  skills: z.array(z.string()).min(1, "Please select at least one skill"),
 });
 
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const Registration = () => {
-  const [savedData, setSavedData] = useState<LoginFormInputs[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const {
     register,
@@ -50,24 +63,19 @@ const Registration = () => {
   });
 
   const onSubmit: SubmitHandler<LoginFormInputs> = (data) => {
-    // Only proceed if the form is valid
     if (isValid) {
       // Retrieve existing data from localStorage
       const existingData = JSON.parse(localStorage.getItem("formData") || "[]");
 
-      // Add the new data to the array
+      // Add the new data (including selected skills)
       const updatedData = [...existingData, data];
 
-      // Save the updated array back to localStorage
+      // Save the updated data back to localStorage
       localStorage.setItem("formData", JSON.stringify(updatedData));
-
-      // Update the state with the saved data
-      setSavedData(updatedData);
       setIsSubmitted(true);
 
-      // Clear input fields
+      // Reset the form fields after submission
       reset();
-
       // Hide alert after 3 seconds
       setTimeout(() => {
         setIsSubmitted(false);
@@ -75,11 +83,20 @@ const Registration = () => {
     }
   };
 
-  // Load saved data from localStorage on component mount
   React.useEffect(() => {
+    // Retrieve data from localStorage on initial load and update state
     const data = JSON.parse(localStorage.getItem("formData") || "[]");
-    setSavedData(data);
   }, []);
+
+  // Cities Array 
+  const cities = [
+    "New York",
+    "Los Angeles",
+    "Chicago",
+    "Houston",
+    "Phoenix",
+    "Philadelphia",
+  ];
 
   return (
     <Container>
@@ -112,6 +129,7 @@ const Registration = () => {
             onSubmit={handleSubmit(onSubmit)}
             sx={{ mt: 2, width: "100%" }}
           >
+
             <TextField
               fullWidth
               label="Name"
@@ -121,33 +139,119 @@ const Registration = () => {
               error={!!errors.name}
               helperText={errors.name?.message}
             />
+
             <TextField
               fullWidth
               label="Phone"
               variant="outlined"
+              type="number"
               margin="normal"
               {...register("phone")}
               error={!!errors.phone}
               helperText={errors.phone?.message}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">+91</InputAdornment>
+                ),
+              }}
             />
-            <TextField
+
+            <FormControl
               fullWidth
-              label="City"
               variant="outlined"
               margin="normal"
-              {...register("city")}
               error={!!errors.city}
-              helperText={errors.city?.message}
-            />
+            >
+              <InputLabel>City</InputLabel>
+              <Select label="City" {...register("city")}>
+                {cities.map((city, index) => (
+                  <MenuItem key={index} value={city}>
+                    {city}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.city && (
+                <Typography variant="body2" color="error">
+                  {errors.city.message}
+                </Typography>
+              )}
+            </FormControl>
+
             <TextField
               fullWidth
               label="Account No."
               variant="outlined"
               margin="normal"
+              type="number"
               {...register("account")}
               error={!!errors.account}
               helperText={errors.account?.message}
             />
+
+            <FormControl sx={{ mt: 1 }}>
+              <FormLabel
+                sx={{ textDecoration: "underline", fontWeight: "bold" }}
+                id="demo-radio-buttons-group-label"
+              >
+                Gender :-
+              </FormLabel>
+              <RadioGroup row aria-labelledby="demo-radio-buttons-group-label">
+                <FormControlLabel
+                  value="female"
+                  control={<Radio />}
+                  label="Female"
+                  {...register("gender")}
+                />
+                <FormControlLabel
+                  value="male"
+                  control={<Radio />}
+                  label="Male"
+                  {...register("gender")}
+                />
+                <FormControlLabel
+                  value="other"
+                  control={<Radio />}
+                  label="Other"
+                  {...register("gender")}
+                />
+              </RadioGroup>
+              {errors.gender && (
+                <Typography variant="body1" style={{ color: "red" }}>
+                  {errors.gender.message}
+                </Typography>
+              )}
+            </FormControl>
+
+            <br />
+
+            <FormControl component="fieldset" sx={{ mt: 1 }}>
+              <FormLabel
+                sx={{ textDecoration: "underline", fontWeight: "bold" }}
+                component="legend"
+              >
+                Skills
+              </FormLabel>
+
+              <FormGroup sx={{ display: "flex", flexDirection: "row" }}>
+                {["JavaScript", "React", "TypeScript", "Node.js"].map(
+                  (skill) => (
+                    <FormControlLabel
+                      key={skill}
+                      control={
+                        <Checkbox value={skill} {...register("skills")} />
+                      }
+                      label={skill}
+                    />
+                  )
+                )}
+              </FormGroup>
+              {errors.skills && (
+                <Typography variant="body1" style={{ color: "red" }}>
+                  {errors.skills.message}
+                </Typography>
+              )}
+            </FormControl>
+
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Button
                 type="submit"
@@ -170,12 +274,14 @@ const Registration = () => {
               </Link>
             </Box>
           </Box>
-          {isSubmitted && (
-            <Alert severity="success" sx={{ mt: 3 }}>
-              <Typography>Form submitted successfully!</Typography>
-            </Alert>
-          )}
         </Box>
+
+        {isSubmitted && (
+          <Alert severity="success" sx={{ mt: 3 }}>
+            <Typography>Form submitted successfully!</Typography>
+          </Alert>
+        )}
+        
       </Card>
     </Container>
   );
