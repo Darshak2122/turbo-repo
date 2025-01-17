@@ -25,8 +25,9 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+
 // Zod schema for validation
 const loginSchema = z.object({
   name: z
@@ -79,22 +80,15 @@ const Registration = () => {
       setIsSubmitted(true);
       setTimeout(() => {
         setIsSubmitted(false);
+        window.location.reload()
       }, 3000);
     },
   });
 
   const onSubmit: SubmitHandler<LoginFormInputs> = (data: any) => {
     if (isValid) {
-      // // Retrieve existing data from localStorage
-      // const existingData = JSON.parse(localStorage.getItem("formData") || "[]");
-
-      // // Add the new data (including selected skills)
-      // const updatedData = [...existingData, data];
-
-      // // Save the updated data back to localStorage
-      // localStorage.setItem("formData", JSON.stringify(updatedData));
       mutate(data);
-
+      setIsSubmitted(true);
       reset({
         account: "",
         city: "",
@@ -103,14 +97,8 @@ const Registration = () => {
         phone: "",
         skills: [],
       });
-      console.log(watch('city'))
     }
   };
-
-  // React.useEffect(() => {
-  //   // Retrieve data from localStorage on initial load and update state
-  //   const data = JSON.parse(localStorage.getItem("formData") || "[]");
-  // }, []);
 
   // Cities Array
   const cities = [
@@ -186,7 +174,7 @@ const Registration = () => {
               error={!!errors.city}
             >
               <InputLabel>City</InputLabel>
-              <Select value={watch('city')} label="City" {...register("city")}>
+              <Select value={watch("city")} label="City" {...register("city")}>
                 <MenuItem value="" disabled>
                   Select a city
                 </MenuItem>
@@ -224,6 +212,7 @@ const Registration = () => {
               <RadioGroup row aria-labelledby="demo-radio-buttons-group-label">
                 <FormControlLabel
                   value="female"
+                  checked={watch("gender") === "female"}
                   control={<Radio />}
                   label="Female"
                   {...register("gender")}

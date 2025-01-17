@@ -1,11 +1,30 @@
-import React from 'react'
-
- export function TextFields() {
-  
+import {
+  Box,
+  IconButton,
+  InputAdornment,
+  TextField,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+export function TextFields() {
   return (
-    <div>
-    <input style={{height:"40px",width:"300px"}} placeholder='Jay hind Jay bharat' type='text' />
-    </div>
-  )
+    <Box sx={{ backgroundColor: "white" }}>
+      <TextField
+        fullWidth
+        placeholder="Search by City..."
+        // onChange={""}
+        // value={""}
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <IconButton aria-label="description for action">
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          },
+        }}
+      />
+    </Box>
+  );
 }
-
