@@ -22,6 +22,7 @@ import {
   Radio,
   Checkbox,
   FormGroup,
+  FormHelperText,
 } from "@mui/material";
 import Link from "next/link";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -80,7 +81,7 @@ const Registration = () => {
       setIsSubmitted(true);
       setTimeout(() => {
         setIsSubmitted(false);
-        window.location.reload()
+        window.location.reload();
       }, 3000);
     },
   });
@@ -102,12 +103,22 @@ const Registration = () => {
 
   // Cities Array
   const cities = [
-    "New York",
-    "Los Angeles",
-    "Chicago",
-    "Houston",
-    "Phoenix",
-    "Philadelphia",
+    "Ahmedabad",
+    "Anand",
+    "Banaskantha",
+    "Bharuch",
+    "Bhavnagar",
+    "Jamnagar",
+    "Junagadh",
+    "Kutch",
+    "Kheda",
+    "Narmada",
+    "Navsari",
+    "Patan",
+    "Panchmahal",
+    "Porbandar",
+    "Surendranagar",
+    "Surat",
   ];
 
   return (
@@ -126,20 +137,20 @@ const Registration = () => {
           <ArrowBackIcon sx={{ display: "flex", justifyContent: "center" }} />
         </Link>
       </Button>
-      <Card>
+      <Card sx={{borderRadius:"20px"}}>
         <Box
           display="flex"
           flexDirection="column"
           alignItems="center"
           padding="50px"
         >
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h4" sx={{textDecoration:"underline",fontWeight:700}}>
             Registration
           </Typography>
           <Box
             component="form"
             onSubmit={handleSubmit(onSubmit)}
-            sx={{ mt: 2, width: "100%" }}
+            sx={{ mt: 2, width: "100%",border:"1px solid",padding:"30px",borderRadius:"10px" }}
           >
             <TextField
               fullWidth
@@ -175,9 +186,6 @@ const Registration = () => {
             >
               <InputLabel>City</InputLabel>
               <Select value={watch("city")} label="City" {...register("city")}>
-                <MenuItem value="" disabled>
-                  Select a city
-                </MenuItem>
                 {cities.map((city, index) => (
                   <MenuItem key={index} value={city}>
                     {city}
@@ -185,9 +193,9 @@ const Registration = () => {
                 ))}
               </Select>
               {errors.city && (
-                <Typography variant="body2" color="error">
+                <FormHelperText id="my-helper-text">
                   {errors.city.message}
-                </Typography>
+                  </FormHelperText>
               )}
             </FormControl>
 
@@ -277,11 +285,11 @@ const Registration = () => {
                 Register
               </Button>
               <Link
-                href="/showUserData"
+                href="/registration/showUserData"
                 style={{
                   marginTop: "30px",
                   border: "1px solid black",
-                  padding: "8px 10px",
+                  padding: "11px 20px",
                   borderRadius: "8px",
                 }}
               >
