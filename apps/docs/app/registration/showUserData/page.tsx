@@ -43,6 +43,8 @@ import Link from "next/link";
 import { TextFields } from "@repo/sheradcompo";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
+import BackButton from '../../commentCompo/BackButton/page'
+import { toast, ToastContainer } from "react-toastify";
 
 interface DataRow {
   name: string;
@@ -126,6 +128,7 @@ export default function BasicTable() {
       mutate(selectedId);
       setOpen(false);
       setSelectedId(null);
+      toast.success("data DELETED successfully")
     }
   };
 
@@ -167,20 +170,9 @@ export default function BasicTable() {
 
   return (
     <Box sx={{ padding: "20px 50px", marginTop: "50px", marginRight: "30px" }}>
+      <ToastContainer autoClose={2000}/>
       <Box>
-        <Button
-          variant="outlined"
-          sx={{
-            borderRadius: "10px",
-            marginBottom: "20px",
-            color: "wheat",
-            border: "1px solid wheat",
-          }}
-        >
-          <Link href="/registration">
-            <ArrowBackIcon sx={{ display: "flex", justifyContent: "center" }} />
-          </Link>
-        </Button>
+        <BackButton href='/registration'/>
         <TextFields name="search" control={control} />
       </Box>
       <br />

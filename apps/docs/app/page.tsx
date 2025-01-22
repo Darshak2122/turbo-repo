@@ -2,7 +2,6 @@
 import { Button } from "@mui/material";
 import styles from "./page.module.css";
 import Link from "next/link";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export default function Home() {
 

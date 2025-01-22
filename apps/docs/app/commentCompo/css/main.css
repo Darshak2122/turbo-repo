@@ -1,0 +1,46 @@
+.mainBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 50px;
+}
+.boxBtn {
+  display: flex;
+  justify-content: space-between;
+}
+.formLable {
+  text-decoration: underline;
+  font-weight: bold;
+}
+.formGroup {
+  margin-top: 5px;
+  margin-left: 10px;
+}
+.FormControlLabel {
+  gap: 5px;
+}
+.input {
+  margin-left: 5px;
+}
+.backBtn {
+  border-radius: 10px;
+  margin-bottom: 20px;
+  color: wheat;
+  border: 1px solid wheat;
+  margin-top: 40px;
+}
+.arrow {
+  display: flex;
+  justify-content: center;
+}
+.heading {
+  text-decoration: underline;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.showBtn {
+  margin-top: 30px;
+  padding: 11px 20px;
+  border: 1px solid;
+  border-radius: 8px;
+}

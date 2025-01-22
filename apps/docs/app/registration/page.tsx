@@ -1,64 +1,26 @@
 "use client";
-import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Container,
-  Card,
-  Alert,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  InputAdornment,
-  RadioGroup,
-  FormLabel,
-  FormControlLabel,
-  Radio,
-  Checkbox,
-  FormGroup,
-  FormHelperText,
-} from "@mui/material";
-import Link from "next/link";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Box, Container, Card, InputAdornment } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-
-// Zod schema for validation
-const loginSchema = z.object({
-  name: z
-    .string({ required_error: "Name is required" })
-    .min(2, { message: "Name must be 2 characters" })
-    .max(20, { message: "Name must be less than 20 characters" }),
-  city: z
-    .string({ required_error: "City is required" })
-    .min(2, { message: "Please select the city" }),
-  phone: z
-    .string({ required_error: "Phone Number is required" })
-    .regex(/^\d{10}$/, { message: "Phone must be a 10-digit number" }),
-  account: z
-    .string({ required_error: "Account Number is required" })
-    .regex(/^\d{10,12}$/, { message: "Account must be 10-12 digits" }),
-  gender: z.enum(["female", "male", "other"], {
-    message: "Gender is required",
-  }),
-  skills: z.array(z.string()).min(1, "Please select at least one skill"),
-});
-
-type LoginFormInputs = z.infer<typeof loginSchema>;
+import BackButton from "../commentCompo/BackButton/page";
+import { DropDown } from "../commentCompo/dropdown/page";
+import CheckBox from "../commentCompo/checkBox/page";
+import { Buttons } from "../commentCompo/saveBtn/page";
+import { ShowDataBtn } from "../commentCompo/showDataBtn/page";
+import { toast, ToastContainer } from "react-toastify";
+import { CommonTextField } from "../commentCompo/textFields/page";
+import Heading from "../commentCompo/heading/page";
+import { CommonRadioButtonGroup } from "../commentCompo/radioBtn/page";
+import { LoginFormInputs, loginSchema } from "../utils/zodValidation";
+import '../commentCompo/css/main.css'
 
 const Registration = () => {
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const {
-    register,
     handleSubmit,
     reset,
-    watch,
+    control,
     formState: { errors, isValid },
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
@@ -78,9 +40,7 @@ const Registration = () => {
       return await axios.post("http://localhost:4040/users", data);
     },
     onSuccess: () => {
-      setIsSubmitted(true);
       setTimeout(() => {
-        setIsSubmitted(false);
         window.location.reload();
       }, 3000);
     },
@@ -89,7 +49,7 @@ const Registration = () => {
   const onSubmit: SubmitHandler<LoginFormInputs> = (data: any) => {
     if (isValid) {
       mutate(data);
-      setIsSubmitted(true);
+      toast.success("Form submitted successfully");
       reset({
         account: "",
         city: "",
@@ -101,209 +61,72 @@ const Registration = () => {
     }
   };
 
-  // Cities Array
-  const cities = [
-    "Ahmedabad",
-    "Anand",
-    "Banaskantha",
-    "Bharuch",
-    "Bhavnagar",
-    "Jamnagar",
-    "Junagadh",
-    "Kutch",
-    "Kheda",
-    "Narmada",
-    "Navsari",
-    "Patan",
-    "Panchmahal",
-    "Porbandar",
-    "Surendranagar",
-    "Surat",
-  ];
-
   return (
     <Container>
-      <Button
-        variant="outlined"
-        sx={{
-          borderRadius: "10px",
-          marginBottom: "30px",
-          color: "wheat",
-          marginTop: "20px",
-          border: "1px solid wheat",
-        }}
-      >
-        <Link href="/">
-          <ArrowBackIcon sx={{ display: "flex", justifyContent: "center" }} />
-        </Link>
-      </Button>
-      <Card sx={{borderRadius:"20px"}}>
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          padding="50px"
-        >
-          <Typography variant="h4" sx={{textDecoration:"underline",fontWeight:700}}>
-            Registration
-          </Typography>
+      <ToastContainer autoClose={2000} />
+      <BackButton href="/" />
+      <Card sx={{ borderRadius: "20px" }}>
+        <Box className="mainBox">
+          <Heading />
           <Box
             component="form"
             onSubmit={handleSubmit(onSubmit)}
-            sx={{ mt: 2, width: "100%",border:"1px solid",padding:"30px",borderRadius:"10px" }}
+            sx={{
+              mt: 2,
+              width: "100%",
+              border: "1px solid",
+              padding: "30px",
+              borderRadius: "10px",
+            }}
           >
-            <TextField
-              fullWidth
+            <CommonTextField
+              control={control}
               label="Name"
-              variant="outlined"
-              margin="normal"
-              {...register("name")}
+              name="name"
+              type="string"
               error={!!errors.name}
               helperText={errors.name?.message}
             />
-
-            <TextField
-              fullWidth
-              label="Phone"
-              variant="outlined"
+            <CommonTextField
+              control={control}
               type="number"
-              margin="normal"
-              {...register("phone")}
+              label="Phone"
+              name="phone"
               error={!!errors.phone}
               helperText={errors.phone?.message}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">+91</InputAdornment>
-                ),
-              }}
+              startAdornment={
+                <InputAdornment position="start">+91</InputAdornment>
+              }
             />
-
-            <FormControl
-              fullWidth
-              variant="outlined"
-              margin="normal"
-              error={!!errors.city}
-            >
-              <InputLabel>City</InputLabel>
-              <Select value={watch("city")} label="City" {...register("city")}>
-                {cities.map((city, index) => (
-                  <MenuItem key={index} value={city}>
-                    {city}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.city && (
-                <FormHelperText id="my-helper-text">
-                  {errors.city.message}
-                  </FormHelperText>
-              )}
-            </FormControl>
-
-            <TextField
-              fullWidth
+            <DropDown name="city" control={control} />
+            <CommonTextField
+              control={control}
               label="Account No."
-              variant="outlined"
-              margin="normal"
+              name="account"
               type="number"
-              {...register("account")}
               error={!!errors.account}
               helperText={errors.account?.message}
             />
-
-            <FormControl sx={{ mt: 1 }}>
-              <FormLabel
-                sx={{ textDecoration: "underline", fontWeight: "bold" }}
-                id="demo-radio-buttons-group-label"
-              >
-                Gender :-
-              </FormLabel>
-              <RadioGroup row aria-labelledby="demo-radio-buttons-group-label">
-                <FormControlLabel
-                  value="female"
-                  checked={watch("gender") === "female"}
-                  control={<Radio />}
-                  label="Female"
-                  {...register("gender")}
-                />
-                <FormControlLabel
-                  value="male"
-                  control={<Radio />}
-                  label="Male"
-                  {...register("gender")}
-                />
-                <FormControlLabel
-                  value="other"
-                  control={<Radio />}
-                  label="Other"
-                  {...register("gender")}
-                />
-              </RadioGroup>
-              {errors.gender && (
-                <Typography variant="body1" style={{ color: "red" }}>
-                  {errors.gender.message}
-                </Typography>
-              )}
-            </FormControl>
-
+            <CommonRadioButtonGroup
+              control={control}
+              label="Gender"
+              name="gender"
+              error={!!errors.gender}
+              helperText={errors.gender?.message}
+              options={[
+                { label: "Female", value: "female" },
+                { label: "Male", value: "male" },
+                { label: "Other", value: "other" },
+              ]}
+            />
             <br />
-
-            <FormControl component="fieldset" sx={{ mt: 1 }}>
-              <FormLabel
-                sx={{ textDecoration: "underline", fontWeight: "bold" }}
-                component="legend"
-              >
-                Skills
-              </FormLabel>
-
-              <FormGroup sx={{ display: "flex", flexDirection: "row" }}>
-                {["JavaScript", "React", "TypeScript", "Node.js"].map(
-                  (skill) => (
-                    <FormControlLabel
-                      key={skill}
-                      control={
-                        <Checkbox value={skill} {...register("skills")} />
-                      }
-                      label={skill}
-                    />
-                  )
-                )}
-              </FormGroup>
-              {errors.skills && (
-                <Typography variant="body1" style={{ color: "red" }}>
-                  {errors.skills.message}
-                </Typography>
-              )}
-            </FormControl>
-
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3 }}
-              >
-                Register
-              </Button>
-              <Link
-                href="/registration/showUserData"
-                style={{
-                  marginTop: "30px",
-                  border: "1px solid black",
-                  padding: "11px 20px",
-                  borderRadius: "8px",
-                }}
-              >
-                Show Users
-              </Link>
+            <CheckBox name="skills" control={control} />
+            <Box className="boxBtn">
+              <Buttons name="submit" control={control} />
+              <ShowDataBtn />
             </Box>
           </Box>
         </Box>
-
-        {isSubmitted && (
-          <Alert severity="success" sx={{ mt: 3 }}>
-            <Typography>Form submitted successfully!</Typography>
-          </Alert>
-        )}
       </Card>
     </Container>
   );
