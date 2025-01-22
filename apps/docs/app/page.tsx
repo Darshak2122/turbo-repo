@@ -11,7 +11,7 @@ export default function Home() {
         <main className={styles.main}>
           <h3> ⇒ Registration Form using react-hook-form, Zod, TypeScript</h3>
           <Button style={{ border: "1px solid wheat", color: "wheat" }}>
-            <Link href="/registration">Registration Form</Link>
+            <Link href="/showUserData">Registration Form</Link>
           </Button>
         </main>
       </div>

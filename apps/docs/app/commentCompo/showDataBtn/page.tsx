@@ -4,7 +4,7 @@ import '../css/main.css'
 export function ShowDataBtn() {
   return (
     <Link
-      href="/registration/showUserData"
+      href="/showUserData"
       className="showBtn"
     >
       Show Users

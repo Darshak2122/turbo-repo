@@ -14,7 +14,16 @@ import { CommonTextField } from "../commentCompo/textFields/page";
 import Heading from "../commentCompo/heading/page";
 import { CommonRadioButtonGroup } from "../commentCompo/radioBtn/page";
 import { LoginFormInputs, loginSchema } from "../utils/zodValidation";
-import '../commentCompo/css/main.css'
+import "../commentCompo/css/main.css";
+
+const defaultValues: LoginFormInputs = {
+  account: "",
+  city: "",
+  gender: "male",
+  name: "",
+  phone: "",
+  skills: [],
+};
 
 const Registration = () => {
   const {
@@ -24,15 +33,8 @@ const Registration = () => {
     formState: { errors, isValid },
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
-    mode: "onBlur",
-    defaultValues: {
-      account: "",
-      city: "select a city",
-      gender: "male",
-      name: "",
-      phone: "",
-      skills: [],
-    },
+    mode: "all",
+    values: defaultValues,
   });
 
   const { mutate } = useMutation({
@@ -48,7 +50,7 @@ const Registration = () => {
 
   const onSubmit: SubmitHandler<LoginFormInputs> = (data: any) => {
     if (isValid) {
-      mutate(data);
+      // mutate(data);
       toast.success("Form submitted successfully");
       reset({
         account: "",
@@ -64,7 +66,9 @@ const Registration = () => {
   return (
     <Container>
       <ToastContainer autoClose={2000} />
+
       <BackButton href="/" />
+
       <Card sx={{ borderRadius: "20px" }}>
         <Box className="mainBox">
           <Heading />
@@ -98,7 +102,9 @@ const Registration = () => {
                 <InputAdornment position="start">+91</InputAdornment>
               }
             />
+            
             <DropDown name="city" control={control} />
+
             <CommonTextField
               control={control}
               label="Account No."

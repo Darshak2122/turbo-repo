@@ -39,6 +39,7 @@ export function DropDown({ control, name}: any) {
       <InputLabel>City</InputLabel>
       <Select
         label="City"
+        value={value}
         onChange={(e) => handleChangeCity(e.target.value)}
       >
         {cities.map((city, index) => (

@@ -20,6 +20,7 @@ export function TextFields({control,name}:any) {
     <Box sx={{ backgroundColor: "white" }}>
       <TextField
         {...field}
+        value={value}
         fullWidth
         placeholder="Search by City..."
         onChange={(e:any)=>handleSearchChange(e.target.value)}

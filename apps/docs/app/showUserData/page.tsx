@@ -43,8 +43,11 @@ import Link from "next/link";
 import { TextFields } from "@repo/sheradcompo";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
-import BackButton from '../../commentCompo/BackButton/page'
+import BackButton from "../commentCompo/BackButton/page";
 import { toast, ToastContainer } from "react-toastify";
+import DeleteDialog from "../commentCompo/DeleteDialog/page";
+import { Transition } from "../commentCompo/DeleteDialog/page";
+// import { DataTable } from "../../commentCompo/DataTable/page";
 
 interface DataRow {
   name: string;
@@ -59,15 +62,6 @@ interface DataRow {
 interface Search {
   search: string;
 }
-
-const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement<any, any>;
-  },
-  ref: React.Ref<unknown>
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 export default function BasicTable() {
   const [open, setOpen] = React.useState(false);
@@ -101,7 +95,6 @@ export default function BasicTable() {
       )
     : data;
 
-  // data delete by id
   const { mutate } = useMutation({
     mutationFn: async (id: number) => {
       const items = await axios.delete(`http://localhost:4040/users/${id}`);
@@ -113,25 +106,6 @@ export default function BasicTable() {
       }),
   });
 
-  const handleClickOpen = (id: number) => {
-    setSelectedId(id);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedId(null);
-  };
-
-  const handleConfirmDelete = () => {
-    if (selectedId !== null) {
-      mutate(selectedId);
-      setOpen(false);
-      setSelectedId(null);
-      toast.success("data DELETED successfully")
-    }
-  };
-
   const handleClickOpens = (user: DataRow) => {
     setEditData(user);
     setOpenEdit(true);
@@ -140,6 +114,22 @@ export default function BasicTable() {
   const handleCloses = () => {
     setOpenEdit(false);
     setEditData(null);
+  };
+
+  const handleOpenDeleteDialog = (id: number) => {
+    setSelectedId(id);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setSelectedId(null);
+  };
+
+  const handleDelete = () => {
+    if (selectedId !== null) {
+      mutate(selectedId);
+      setSelectedId(null);
+      toast.success("Data deleted successfully");
+    }
   };
 
   // edit function
@@ -170,9 +160,14 @@ export default function BasicTable() {
 
   return (
     <Box sx={{ padding: "20px 50px", marginTop: "50px", marginRight: "30px" }}>
-      <ToastContainer autoClose={2000}/>
+      <ToastContainer autoClose={2000} />
       <Box>
-        <BackButton href='/registration'/>
+        <Box sx={{display:"flex",justifyContent:"space-between"}}>
+        <BackButton href="/" />
+        <Link href="registration" style={{marginTop:"40px"}}>
+          <Button sx={{border:"1px solid white",color:"white"}}>Add User</Button>
+        </Link>
+        </Box>
         <TextFields name="search" control={control} />
       </Box>
       <br />
@@ -229,7 +224,7 @@ export default function BasicTable() {
                     <Button onClick={() => handleClickOpens(row)}>
                       <EditIcon />
                     </Button>
-                    <Button onClick={() => handleClickOpen(row.id)}>
+                    <Button onClick={() => handleOpenDeleteDialog(row.id)}>
                       <DeleteIcon />
                     </Button>
                   </TableCell>
@@ -263,23 +258,13 @@ export default function BasicTable() {
         )}
       </TableContainer>
 
-      {/* item delete Dialog Box */}
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={handleClose}
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle>
-          {"Are you sure you want to delete this item?"}
-        </DialogTitle>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleConfirmDelete}>Confirm</Button>
-        </DialogActions>
-      </Dialog>
-
+      <DeleteDialog
+        open={selectedId !== null}
+        onClose={handleCloseDeleteDialog}
+        onConfirm={handleDelete}
+        title={"Are you sure you want to delete this item?"}
+        control={control}
+      />
       {/* Item Update Dialog Box */}
       <Dialog
         fullScreen
@@ -289,13 +274,13 @@ export default function BasicTable() {
         sx={{ backgroundColor: "#F2F7F2" }}
       >
         <AppBar sx={{ position: "relative", backgroundColor: "#C8A2C8" }}>
-          <Toolbar sx={{display:"flex",justifyContent:"space-between"}}>
+          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
             <IconButton
               edge="start"
               color="inherit"
               onClick={handleCloses}
               aria-label="close"
-              sx={{ backgroundColor: "#34495e",width:"45px" }}
+              sx={{ backgroundColor: "#34495e", width: "45px" }}
             >
               X
             </IconButton>
@@ -323,7 +308,16 @@ export default function BasicTable() {
           >
             Update User Data
           </Typography>
-          <Box component="form" sx={{ mt: 2, width: "60%",border:"1px solid",padding:"30px 40px",borderRadius:"10px" }}>
+          <Box
+            component="form"
+            sx={{
+              mt: 2,
+              width: "60%",
+              border: "1px solid",
+              padding: "30px 40px",
+              borderRadius: "10px",
+            }}
+          >
             <TextField
               fullWidth
               label="Name"
